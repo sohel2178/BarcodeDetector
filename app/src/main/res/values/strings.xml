@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">BarcodeDetector</string>
+
+    <string name="font_fontFamily_medium">sans-serif</string>
+
+
+    <string name="scan">Scan</string>
+    <string name="decode">Encode</string>
+    <string name="save">Saved</string>
+</resources>
