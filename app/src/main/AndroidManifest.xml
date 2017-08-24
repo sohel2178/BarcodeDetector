@@ -29,7 +29,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Activities.BarcodeScannerActivity"></activity>
+        <activity android:name=".Activities.BarcodeScannerActivity" />
+        <activity android:name=".Activities.TestActivity"></activity>
+
+        <receiver android:name=".Receiver.MyReceiver">
+            <intent-filter>
+                <action android:name="sohel.ahmed.rashin.receiver"></action>
+                <category android:name="android.intent.category.DEFAULT"></category>
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

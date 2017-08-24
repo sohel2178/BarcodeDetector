@@ -1,7 +1,9 @@
 package com.linearbd.barcodedetector.Fragments;
 
 
+import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,7 +13,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.google.android.gms.vision.barcode.Barcode;
 import com.linearbd.barcodedetector.Activities.BarcodeScannerActivity;
+import com.linearbd.barcodedetector.Activities.TestActivity;
 import com.linearbd.barcodedetector.R;
 
 
@@ -19,7 +23,7 @@ import com.linearbd.barcodedetector.R;
  * A simple {@link Fragment} subclass.
  */
 public class ScanFragment extends Fragment implements View.OnClickListener {
-    private ImageView ivScan;
+    private ImageView ivScan,ivTest;
     private static final int BAR_CODE_REQUEST=100;
 
 
@@ -39,6 +43,7 @@ public class ScanFragment extends Fragment implements View.OnClickListener {
 
     private void initView(View view) {
         ivScan = view.findViewById(R.id.iv_scan);
+        ivTest = view.findViewById(R.id.iv_test);
 
     }
 
@@ -46,6 +51,7 @@ public class ScanFragment extends Fragment implements View.OnClickListener {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         ivScan.setOnClickListener(this);
+        ivTest.setOnClickListener(this);
     }
 
     @Override
@@ -54,12 +60,21 @@ public class ScanFragment extends Fragment implements View.OnClickListener {
             case R.id.iv_scan:
                 openBarcodeScannerActivity();
                 break;
+
+            case R.id.iv_test:
+                openTestActivity();
+                break;
         }
     }
 
+    private void openTestActivity() {
+        //startActivity(new Intent(getActivity().getApplicationContext(), TestActivity.class));
+        startActivityForResult(new Intent(getActivity().getApplicationContext(), TestActivity.class),BAR_CODE_REQUEST);
+    }
+
     private void openBarcodeScannerActivity() {
-        //startActivity(new Intent(getActivity().getApplicationContext(), BarcodeScannerActivity.class));
-        getActivity().startActivityForResult(new Intent(getActivity().getApplicationContext(), BarcodeScannerActivity.class),BAR_CODE_REQUEST);
+        startActivity(new Intent(getActivity().getApplicationContext(), BarcodeScannerActivity.class));
+        //startActivityForResult(new Intent(getActivity().getApplicationContext(), BarcodeScannerActivity.class),BAR_CODE_REQUEST);
     }
 
 
@@ -67,8 +82,30 @@ public class ScanFragment extends Fragment implements View.OnClickListener {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode==BAR_CODE_REQUEST){
-            Log.d("SOHELCODE","YYY");
+        Log.d("SOHELCODE","onActivityResult");
+
+        if(requestCode==BAR_CODE_REQUEST && resultCode== Activity.RESULT_OK){
+
+            //Bundle bundle = data.getExtras();
+
+            Log.d("SOHELCODE",data.getStringExtra("result"));
+
+            Barcode barcode = (Barcode) data.getExtras().getParcelable("data");
+
+            if(barcode!=null){
+                Log.d("SOHELCODE",barcode.displayValue);
+
+                String url = barcode.displayValue;
+
+                if(url.startsWith("http://") || url.startsWith("https://")){
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(barcode.displayValue));
+                    startActivity(browserIntent);
+                }
+
+
+            }
+
+
         }
     }
 }

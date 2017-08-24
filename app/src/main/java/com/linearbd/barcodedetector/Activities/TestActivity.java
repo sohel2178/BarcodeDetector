@@ -1,12 +1,12 @@
 package com.linearbd.barcodedetector.Activities;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,38 +20,82 @@ import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
 import com.linearbd.barcodedetector.BarcodeModel.Helper.BarcodeTrackerFactory;
-import com.linearbd.barcodedetector.BarcodeModel.UI.CameraSourcePreview;
-import com.linearbd.barcodedetector.BarcodeModel.UI.GraphicOverlay;
 import com.linearbd.barcodedetector.Listener.BarcodeListener;
 import com.linearbd.barcodedetector.R;
+import com.linearbd.barcodedetector.Receiver.MyReceiver;
+import com.linearbd.barcodedetector.TestModel.BarTrackerFactory;
+import com.linearbd.barcodedetector.TestModel.CameraView;
 
-import net.glxn.qrgen.android.QRCode;
-
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
-public class BarcodeScannerActivity extends AppCompatActivity implements BarcodeListener{
+public class TestActivity extends AppCompatActivity implements BarcodeListener{
     private static final int CAMERA_PERMISSION=4000;
     private static final int RC_HANDLE_GMS=5000;
 
-    private GraphicOverlay mGraphicOverLay;
-    private CameraSourcePreview mCameraSourcePreview;
     private CameraSource mCameraSource = null;
-
     private boolean hasPermission;
+    private boolean mBarCodeFound;
+
+    private Barcode barcode;
+
+    private CameraView cameraView;
+
+    BarcodeDetector barcodeDetector;
+
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            Log.d("LLLL","JJJJ");
+
+            returnIntent();
+
+            //TestActivity.this.finish();
+
+        }
+    };
+
+    private void returnIntent() {
+
+        Intent returnIntent = new Intent();
+        returnIntent.putExtra("data",barcode);
+        returnIntent.putExtra("result","uuuuu");
+        setResult(Activity.RESULT_OK,returnIntent);
+        finish();
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_barcode_scanner);
+        setContentView(R.layout.activity_test);
 
         cameraPermission();
+
+
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addCategory(Intent.CATEGORY_DEFAULT);
+        intentFilter.addAction("sohel.ahmed.rashin.receiver");
+
+        registerReceiver(broadcastReceiver,intentFilter);
+
+    }
+
+    @Override
+    protected void onStop() {
+        unregisterReceiver(broadcastReceiver);
+        super.onStop();
+    }
 
     @AfterPermissionGranted(CAMERA_PERMISSION)
     private void cameraPermission() {
@@ -60,8 +104,9 @@ public class BarcodeScannerActivity extends AppCompatActivity implements Barcode
             // Already have permission, do the thing
             hasPermission = true;
 
-            initView();
-            
+            cameraView = (CameraView) findViewById(R.id.camera_view);
+
+
             createCameraSource();
 
 
@@ -76,15 +121,11 @@ public class BarcodeScannerActivity extends AppCompatActivity implements Barcode
         }
     }
 
-    private void initView() {
-        mCameraSourcePreview = (CameraSourcePreview) findViewById(R.id.preview);
-        mGraphicOverLay = (GraphicOverlay) findViewById(R.id.graphic_overlay);
-    }
-
     private void createCameraSource() {
-        BarcodeDetector barcodeDetector = new BarcodeDetector.Builder(getApplicationContext()).build();
-        BarcodeTrackerFactory barcodeFactory = new BarcodeTrackerFactory(mGraphicOverLay);
-        barcodeFactory.setBarcodeListener(this);
+        barcodeDetector = new BarcodeDetector.Builder(getApplicationContext()).build();
+        BarTrackerFactory barcodeFactory = new BarTrackerFactory();
+        barcodeFactory.setListener(this);
+
 
         barcodeDetector.setProcessor(new MultiProcessor.Builder<>(barcodeFactory).build());
 
@@ -103,15 +144,6 @@ public class BarcodeScannerActivity extends AppCompatActivity implements Barcode
                 .build();
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        EasyPermissions.onRequestPermissionsResult(
-                requestCode, permissions, grantResults, this);
-    }
-
 
     @Override
     protected void onResume() {
@@ -128,7 +160,7 @@ public class BarcodeScannerActivity extends AppCompatActivity implements Barcode
 
     @Override
     protected void onPause() {
-        mCameraSourcePreview.stop();
+        cameraView.stop();
         super.onPause();
     }
 
@@ -156,7 +188,7 @@ public class BarcodeScannerActivity extends AppCompatActivity implements Barcode
         if (mCameraSource != null) {
             try {
                 Log.d("TEST","CAmera Source Start");
-                mCameraSourcePreview.start(mCameraSource, mGraphicOverLay);
+                cameraView.start(mCameraSource);
             } catch (IOException e) {
                 Log.d("TEST","CAmera Source Not Start");
                 mCameraSource.release();
@@ -167,29 +199,26 @@ public class BarcodeScannerActivity extends AppCompatActivity implements Barcode
 
     @Override
     public void detect(Barcode barcode) {
-        Log.d("SOHELCODE","Found");
-        /*Log.d("SOHELCODE",barcode.displayValue);
-        Log.d("SOHELCODE",barcode.rawValue);
-        Log.d("SOHELCODE",barcode.contactInfo.name.first);
-        Log.d("SOHELCODE",barcode.contactInfo.name.last);
-       // Log.d("SOHELCODE",barcode.displayValue);
+        Log.d("GGG","Found");
+        mBarCodeFound = true;
+        this.barcode = barcode;
 
-        Bundle bundle = new Bundle();
-        bundle.putSerializable("kkk", (Serializable) barcode);
 
         Intent intent = new Intent();
-        intent.putExtras(bundle);
+        intent.addCategory(Intent.CATEGORY_DEFAULT);
+        intent.setAction("sohel.ahmed.rashin.receiver");
 
-        setResult(RESULT_OK);*/
 
-       /* Bundle bundle = new Bundle();
-        bundle.putSerializable("kkk", (Serializable) barcode);
+        sendBroadcast(intent);
 
-        Intent intent = new Intent();
-        intent.putExtras(bundle);
+       /* while (mBarCodeFound){
+            cameraView.stop();
+            mCameraSource.release();
+            TestActivity.this.finish();
+        }*/
 
-        setResult(RESULT_OK);*/
 
-       BarcodeScannerActivity.this.finish();
+
     }
+
 }

@@ -1,5 +1,7 @@
 package com.linearbd.barcodedetector.BarcodeModel.Helper;
 
+import android.util.Log;
+
 import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.barcode.Barcode;
@@ -26,6 +28,8 @@ public class BarcodeTrackerFactory implements MultiProcessor.Factory<Barcode> {
     @Override
     public Tracker<Barcode> create(Barcode barcode) {
         BarcodeGraphic barcodeGraphic = new BarcodeGraphic(graphicOverlay);
+
+        Log.d("NNNN",barcode.displayValue);
 
         if(listener!= null){
             listener.detect(barcode);

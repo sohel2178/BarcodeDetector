@@ -4,15 +4,19 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.util.Log;
 
 import com.google.android.gms.vision.barcode.Barcode;
 import com.linearbd.barcodedetector.BarcodeModel.UI.GraphicOverlay;
+import com.linearbd.barcodedetector.Listener.BarcodeListener;
 
 /**
  * Created by Genius 03 on 8/23/2017.
  */
 
 public class BarcodeGraphic extends TrackedGraphic<Barcode> {
+
+    private BarcodeListener listener;
 
     private static final int COLOR_CHOICES[] = {
             Color.BLUE,
@@ -44,8 +48,16 @@ public class BarcodeGraphic extends TrackedGraphic<Barcode> {
     @Override
     void updateItem(Barcode item) {
         mBarcode = item;
+
+        if(listener != null){
+            listener.detect(item);
+        }
         postInvalidate();
 
+    }
+
+    public void setBarcodeListener(BarcodeListener listener){
+        this.listener = listener;
     }
 
     // This method is for Graphic Class

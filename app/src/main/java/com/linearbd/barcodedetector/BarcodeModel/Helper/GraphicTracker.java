@@ -31,6 +31,7 @@ public class GraphicTracker<T> extends Tracker<T> {
         mOverlay.add(mGraphic);
         mGraphic.updateItem(t);
 
+
     }
 
     @Override
