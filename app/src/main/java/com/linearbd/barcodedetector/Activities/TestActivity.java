@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -46,11 +47,17 @@ public class TestActivity extends AppCompatActivity implements BarcodeListener{
 
     BarcodeDetector barcodeDetector;
 
+    private Bitmap mBitmap=null;
+
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
 
             Log.d("LLLL","JJJJ");
+
+
+
+
 
             returnIntent();
 
@@ -61,11 +68,22 @@ public class TestActivity extends AppCompatActivity implements BarcodeListener{
 
     private void returnIntent() {
 
+        cameraView.release();
+
+        setBitMap();
+
         Intent returnIntent = new Intent();
         returnIntent.putExtra("data",barcode);
+        //returnIntent.putExtra("bitmap",mBitmap);
+        /*if(mBitmap!= null){
+            Log.d("LLLL","SURU");
+
+            Log.d("LLLL","SES");
+        }
+        Log.d("LLLL","BAHIR");*/
         returnIntent.putExtra("result","uuuuu");
         setResult(Activity.RESULT_OK,returnIntent);
-        finish();
+        TestActivity.this.finish();
     }
 
 
@@ -200,6 +218,8 @@ public class TestActivity extends AppCompatActivity implements BarcodeListener{
     @Override
     public void detect(Barcode barcode) {
         Log.d("GGG","Found");
+
+        //cameraView.release();
         mBarCodeFound = true;
         this.barcode = barcode;
 
@@ -219,6 +239,12 @@ public class TestActivity extends AppCompatActivity implements BarcodeListener{
 
 
 
+    }
+
+    private void setBitMap(){
+        cameraView.setDrawingCacheEnabled(true);
+        cameraView.buildDrawingCache();
+        mBitmap = cameraView.getDrawingCache(true);
     }
 
 }

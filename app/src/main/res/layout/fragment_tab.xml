@@ -3,22 +3,47 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="@dimen/default_padding"
+    android:id="@+id/cointainer"
     tools:context="com.linearbd.barcodedetector.Fragments.ScanFragment">
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/layout1">
 
-    <ImageView
-        android:layout_width="@dimen/icon_size"
-        android:layout_height="@dimen/icon_size"
-        android:layout_centerHorizontal="true"
-        android:src="@drawable/color_camera"
-        android:id="@+id/iv_scan"/>
 
-    <ImageView
-        android:layout_width="@dimen/icon_size"
-        android:layout_height="@dimen/icon_size"
-        android:src="@drawable/color_camera"
-        android:id="@+id/iv_test"
-        android:layout_below="@+id/iv_scan"/>
+        <ImageView
+            android:layout_width="@dimen/icon_size"
+            android:layout_height="@dimen/icon_size"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/color_camera"
+            android:id="@+id/iv_scan"/>
+
+        <ImageView
+            android:layout_width="@dimen/icon_size"
+            android:layout_height="@dimen/icon_size"
+            android:src="@drawable/color_camera"
+            android:id="@+id/iv_test"
+            android:layout_below="@+id/iv_scan"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:id="@+id/layout2">
+
+        <ImageView
+            android:layout_width="@dimen/qr_image_size"
+            android:layout_height="@dimen/qr_image_size"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/iv_image"
+            />
+
+    </RelativeLayout>
+
+
 
 
 

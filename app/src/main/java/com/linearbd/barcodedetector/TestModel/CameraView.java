@@ -1,6 +1,7 @@
 package com.linearbd.barcodedetector.TestModel;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -22,6 +23,7 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
     private CameraSource mCameraSource;
     private boolean mStartRequested;
     private boolean mSurfaceAvailable;
+    private Bitmap mBitmap;
 
     public CameraView(Context context) {
         super(context);
@@ -44,7 +46,10 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
         mSurfaceAvailable = false;
         this.getHolder().addCallback(this);
 
+
     }
+
+
 
     public void start(CameraSource cameraSource) throws IOException {
         if (cameraSource == null) {

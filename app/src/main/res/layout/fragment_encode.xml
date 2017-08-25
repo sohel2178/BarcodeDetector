@@ -1,7 +1,11 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<GridView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
+    android:numColumns="auto_fit"
+    android:columnWidth="@dimen/grid_view_column_width"
+    android:horizontalSpacing="@dimen/grid_view_spacing"
+    android:verticalSpacing="@dimen/grid_view_spacing"
     tools:context="com.linearbd.barcodedetector.Fragments.EncodeFragment">
 
     <!-- TODO: Update blank fragment layout -->
@@ -10,4 +14,4 @@
         android:layout_height="match_parent"
         android:text="Hello" />
 
-</FrameLayout>
+</GridView>

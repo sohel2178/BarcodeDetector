@@ -3,15 +3,18 @@ package com.linearbd.barcodedetector.Fragments;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.transition.TransitionManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import com.google.android.gms.vision.barcode.Barcode;
 import com.linearbd.barcodedetector.Activities.BarcodeScannerActivity;
@@ -23,8 +26,12 @@ import com.linearbd.barcodedetector.R;
  * A simple {@link Fragment} subclass.
  */
 public class ScanFragment extends Fragment implements View.OnClickListener {
-    private ImageView ivScan,ivTest;
+    private ImageView ivScan,ivTest,ivImage;
     private static final int BAR_CODE_REQUEST=100;
+
+    private RelativeLayout rl1,rl2,rlContainer;// rl2 is a hidden layout
+
+    private Bitmap scanBitMap;
 
 
     public ScanFragment() {
@@ -42,8 +49,12 @@ public class ScanFragment extends Fragment implements View.OnClickListener {
     }
 
     private void initView(View view) {
+        rlContainer = view.findViewById(R.id.cointainer);
+        rl1 = view.findViewById(R.id.layout1);
+        rl2 = view.findViewById(R.id.layout2);
         ivScan = view.findViewById(R.id.iv_scan);
         ivTest = view.findViewById(R.id.iv_test);
+        ivImage = view.findViewById(R.id.iv_image);
 
     }
 
@@ -94,6 +105,17 @@ public class ScanFragment extends Fragment implements View.OnClickListener {
 
             if(barcode!=null){
                 Log.d("SOHELCODE",barcode.displayValue);
+                Log.d("SOHELCODE","Format "+barcode.format+"");
+                Log.d("SOHELCODE","Value Format "+barcode.valueFormat+"");
+
+                if(barcode.valueFormat==2){
+                    Barcode.Email email = barcode.email;
+
+                    Log.d("SOHELCODE","Address "+email.address);
+                    Log.d("SOHELCODE","Subject "+email.subject);
+                    Log.d("SOHELCODE","Body "+email.body);
+
+                }
 
                 String url = barcode.displayValue;
 
@@ -102,10 +124,50 @@ public class ScanFragment extends Fragment implements View.OnClickListener {
                     startActivity(browserIntent);
                 }
 
+                scanBitMap = data.getParcelableExtra("bitmap");
+                ivImage.setImageBitmap(scanBitMap);
+
+                transitionLayout();
+
+
+
 
             }
 
 
         }
+    }
+
+    private void transitionLayout() {
+        TransitionManager.beginDelayedTransition(rlContainer);
+
+        if(rl1.getVisibility()==View.VISIBLE){
+            //getScanBitMap();
+            rl1.setVisibility(View.GONE);
+            //ivImage.setImageBitmap(scanBitMap);
+            rl2.setVisibility(View.VISIBLE);
+
+        }else{
+            rl1.setVisibility(View.VISIBLE);
+            rl2.setVisibility(View.GONE);
+        }
+
+
+    }
+
+    public void getScanBitMap() {
+        View view = rl1;
+        view.setDrawingCacheEnabled(true);
+        view.buildDrawingCache();
+
+        Bitmap bitmap = view.getDrawingCache();
+
+        if(bitmap!=null){
+            ivImage.setImageBitmap(bitmap);
+        }else{
+            Log.d("HHHH","ggh");
+        }
+
+       // return view.getDrawingCache();
     }
 }
